@@ -19,8 +19,29 @@ def print_header(headline)
 	puts "-------------"
 end
 
-def print_names(students)
-	students.each_with_index { |student, index| puts "#{index + 1}.  #{student[:name]} (#{student[:cohort].capitalize} cohort)" }
+def print_all_names(students)
+	# => Using each with index:
+	# students.each_with_index { |student, index| puts "#{index + 1}.  #{student[:name]} (#{student[:cohort].capitalize} cohort)" }
+
+	# => Using loop:
+	iter = 0
+	while iter < students.length
+		student = students[iter]
+		iter += 1
+		puts "#{iter}.  #{student[:name]} (#{student[:cohort].capitalize} cohort)"
+	end
+end
+
+def print_with_initial(students, initial)
+	# => Print if letter begins with chosen initial.
+	selection = students.select { |student| student[:name][0].downcase == initial.downcase }
+	selection.each_with_index { |student, index| puts "#{index + 1}.  #{student[:name]} (#{student[:cohort].capitalize} cohort)" }
+end
+
+def print_names_less_than(students, x)
+	# => Print names with less than x characters
+	selection = students.select { |student| student[:name].length < x }
+	selection.each_with_index { |student, index| puts "#{index + 1}.  #{student[:name]} (#{student[:cohort].capitalize} cohort)" }
 end
 
 def print_footer(students)
@@ -29,5 +50,8 @@ end
 
 students = input_students
 print_header("The Students of Makers Academy:")
-print_names(students)
+print_all_names(students)
 print_footer(students)
+
+# print_with_initial(students, 'a')
+# print_names_less_than(students, 5)
