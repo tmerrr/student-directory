@@ -6,7 +6,13 @@ def input_students
 		name = gets.chomp
 		puts
 		break if name.empty?
-		students << {name: name, cohort: 'october'}
+		puts "Please enter cohort"
+		cohort = gets.chomp
+		puts
+		puts "Please enter DOB (DD/MM/YYYY)"
+		dob = gets.chomp
+		puts
+		students << {name: name, cohort: cohort, dob: dob}
 		puts "#{name} has been added."
 		puts "We now have a total of #{students.count} students."
 		puts
@@ -15,8 +21,9 @@ def input_students
 end
 
 def print_header(headline)
-	puts headline
-	puts "-------------"
+	width = 50
+	puts headline.center(width)
+	puts "-------------".center(width)
 end
 
 def print_all_names(students)
@@ -45,7 +52,9 @@ def print_names_less_than(students, x)
 end
 
 def print_footer(students)
-	puts "Overall, we have #{students.length} great students"
+	width = 50
+	puts "-------------".center(width)
+	puts "Overall, we have #{students.length} great students".center(width)
 end
 
 students = input_students
