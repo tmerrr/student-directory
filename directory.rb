@@ -14,7 +14,7 @@ def input_students
 		puts
 		students << {name: name, cohort: cohort, dob: dob}
 		puts "#{name} has been added."
-		puts "We now have a total of #{students.count} students."
+		puts "We now have a total of #{students.count} #{students.count > 1 ? 'students' : 'student'}."
 		puts
 	end
 	students
@@ -54,7 +54,11 @@ end
 def print_footer(students)
 	width = 50
 	puts "-------------".center(width)
-	puts "Overall, we have #{students.length} great students".center(width)
+	if students.empty?
+		puts "No students have been added to the directory.".center(width)
+	else
+		puts "Overall, we have #{students.length} great #{students.length > 1 ? 'students' : 'student'}".center(width)
+	end
 end
 
 students = input_students
