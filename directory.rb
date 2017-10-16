@@ -1,5 +1,6 @@
+@students = []
+
 def menu
-	@students = []
 	loop do
 		print_menu_options
 		menu_selection(gets.chomp)
@@ -11,6 +12,7 @@ def print_menu_options
 	puts "1. Input students"
 	puts "2. Print students"
 	puts "3. Save list to students.csv"
+	puts "4. Load list from students.csv"
 	puts "9. Exit program"
 end
 
@@ -20,6 +22,7 @@ def menu_selection(user_input)
 	when '1' then input_students
 	when '2' then sort_students
 	when '3' then save_students
+	when '4' then load_students
 	when '9' then abort('Program Ended')
 	else
 		puts "#{user_input} is not a valid entry"
@@ -153,6 +156,15 @@ def save_students
 		student_data = [student[:name], student[:cohort]]
 		csv_line = student_data.join(',')
 		file.puts csv_line
+	end
+	file.close
+end
+
+def load_students
+	file = File.open("students.csv", 'r')
+	file.readlines.each do |line|
+		name, cohort = line.chomp.split(',')
+		@students << {name: name, cohort: cohort.to_sym}
 	end
 	file.close
 end
