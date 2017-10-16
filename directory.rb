@@ -3,7 +3,7 @@
 def menu
 	loop do
 		print_menu_options
-		menu_selection(gets.chomp)
+		menu_selection(STDIN.gets.chomp)
 	end
 end
 
@@ -45,7 +45,7 @@ def input_students
 	puts
 	loop do 
 		puts "Please enter full name."
-		name = gets.chomp
+		name = STDIN.gets.chomp
 		puts
 		break if name.empty?
 		puts "Please enter cohort."
@@ -60,7 +60,7 @@ end
 def get_month
 	months = [	'January', 'February', 'March', 'April', 'May', 'June',
 				'July', 'August', 'September', 'October', 'November', 'December']
-	input = gets.chomp.capitalize
+	input = STDIN.gets.chomp.capitalize
 	puts
 	if input.empty?
 		# => Default cohort.
@@ -105,7 +105,7 @@ end
 def print_with_initial
 	# => Print if letter begins with chosen initial.
 	puts "Which initial would you like to sort by?"
-	initial = gets.chomp.downcase
+	initial = STDIN.gets.chomp.downcase
 	puts
 	if initial.length == 1
 		selection = @students.select { |student| student[:name][0].downcase == initial }
@@ -119,7 +119,7 @@ end
 def print_max_chars
 	# => Print names with less than x characters
 	puts "What's the maximum number of characters in a name you'd like to see?"
-	num = gets.chomp.to_i
+	num = STDIN.gets.chomp.to_i
 	puts
 	selection = @students.select { |student| student[:name].length <= num }
 	print_names(selection)
@@ -140,7 +140,7 @@ end
 def get_sort
 	puts "How would you like to sort the list of students?"
 	puts "Options: all / cohort / initial / characters"
-	input = gets.chomp.downcase
+	input = STDIN.gets.chomp.downcase
 	puts
 	if ['all', 'cohort', 'initial', 'characters'].include?(input)
 		input
@@ -160,8 +160,8 @@ def save_students
 	file.close
 end
 
-def load_students
-	file = File.open("students.csv", 'r')
+def load_students(filename = "students.csv")
+	file = File.open(filename, 'r')
 	file.readlines.each do |line|
 		name, cohort = line.chomp.split(',')
 		@students << {name: name, cohort: cohort.to_sym}
@@ -169,4 +169,17 @@ def load_students
 	file.close
 end
 
+def try_load_students
+	filename = ARGV.first
+	return if filename.nil?
+	if File.exists?(filename)
+		load_students(filename)
+		puts "Loaded #{@students.count} from #{filename}"
+		puts
+	else
+		abort "#{filename} not found"
+	end
+end
+
+try_load_students
 menu
