@@ -10,6 +10,7 @@ def print_menu_options
 	puts "What would you like to do next?"
 	puts "1. Input students"
 	puts "2. Print students"
+	puts "3. Save list to students.csv"
 	puts "9. Exit program"
 end
 
@@ -18,6 +19,7 @@ def menu_selection(user_input)
 	case user_input
 	when '1' then input_students
 	when '2' then sort_students
+	when '3' then save_students
 	when '9' then abort('Program Ended')
 	else
 		puts "#{user_input} is not a valid entry"
@@ -143,6 +145,16 @@ def get_sort
 		puts "#{input} is not a valid option."
 		get_sort
 	end
+end
+
+def save_students
+	file = File.open("students.csv", 'w')
+	@students.each do |student|
+		student_data = [student[:name], student[:cohort]]
+		csv_line = student_data.join(',')
+		file.puts csv_line
+	end
+	file.close
 end
 
 menu
