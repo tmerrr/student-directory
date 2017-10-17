@@ -12,8 +12,8 @@ def print_menu_options
 	puts "What would you like to do next?"
 	puts "1. Input students"
 	puts "2. Print students"
-	puts "3. Save list to students.csv"
-	puts "4. Load list from students.csv"
+	puts "3. Save list to file"
+	puts "4. Load list from file"
 	puts "9. Exit program"
 end
 
@@ -22,7 +22,7 @@ def menu_selection(user_input)
 	when '1' then input_students
 	when '2' then sort_students
 	when '3' then save_students
-	when '4' then load_students
+	when '4' then check_before_load
 	when '9' then abort('Program Ended')
 	else
 		puts "#{user_input} is not a valid entry"
@@ -111,8 +111,7 @@ end
 def print_with_initial
 	# => Print if letter begins with chosen initial.
 	puts "Which initial would you like to sort by?"
-	initial = STDIN.gets.chomp.downcase
-	puts
+	initial = get_input.downcase
 	if initial.length == 1
 		selection = @students.select { |student| student[:name][0].downcase == initial }
 		print_names(selection)
@@ -125,8 +124,7 @@ end
 def print_max_chars
 	# => Print names with less than x characters
 	puts "What's the maximum number of characters in a name you'd like to see?"
-	num = STDIN.gets.chomp.to_i
-	puts
+	num = get_input.to_i
 	selection = @students.select { |student| student[:name].length <= num }
 	print_names(selection)
 end
@@ -145,8 +143,7 @@ end
 def get_sort
 	puts "How would you like to sort the list of students?"
 	puts "Options: all / cohort / initial / characters"
-	input = STDIN.gets.chomp.downcase
-	puts
+	input = get_input.downcase
 	input = 'all' if input.empty?
 	if ['all', 'cohort', 'initial', 'characters'].include?(input)
 		input
@@ -158,8 +155,7 @@ end
 
 def save_students
 	puts "Name the file you wish to save to. Enter a blank to save to default file."
-	filename = get_input
-	filename = "students.csv" if filename.empty?
+	filename = get_filename
 	file = File.open(filename, 'w')
 	@students.each do |student|
 		student_data = [student[:name], student[:cohort]]
@@ -170,7 +166,34 @@ def save_students
 	save_load_feedback_message(false, filename)
 end
 
+def confirm?
+	puts "Options: y / n"
+	choice = get_input
+	case choice.downcase
+	when 'y' then true
+	when 'n' then false
+	else
+		puts "#{choice} is not a valid option"
+		confirm?
+	end
+end
+
+def get_filename
+	filename = get_input
+	filename = "students.csv" if filename.empty?
+	filename
+end
+
+def check_before_load
+	if @students.any?
+		puts "Loading from a file will overwrite the current list.  Would you like to continue?"
+		return puts "Cancelled.  Did not load from file." unless confirm?
+	end
+	load_students
+end
+
 def load_students(filename = "students.csv")
+	@students.clear
 	file = File.open(filename, 'r')
 	file.readlines.each do |line|
 		name, cohort = line.chomp.split(',')
