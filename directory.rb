@@ -1,3 +1,4 @@
+require 'csv'
 @students = []
 @width = 50
 
@@ -164,11 +165,10 @@ def save_students
 end
 
 def save_process(filename)
-	File.open(filename, 'w') do |file|
+	CSV.open(filename, 'wb') do |csv|
 		@students.each do |student|
 			student_data = [student[:name], student[:cohort]]
-			csv_line = student_data.join(',')
-			file.puts csv_line
+			csv << student_data
 		end
 	end
 end
@@ -220,12 +220,10 @@ end
 
 def load_students(filename = 'students.csv')
 	@students.clear
-	file = File.open(filename, 'r')
-	file.readlines.each do |line|
-		name, cohort = line.chomp.split(',')
-		add_to_student_array(name, cohort)
+	CSV.foreach(filename) do |row|
+		name, cohort = row.first, row.last
+		@students << {name: name, cohort: cohort}
 	end
-	file.close
 	save_load_feedback_message(true, filename)
 end
 
@@ -239,8 +237,8 @@ def try_load_students
 	end
 end
 
-def save_load_feedback_message(load, filename)
-	puts "Successfully #{load ? 'loaded' : 'saved'} #{@students.count} students #{load ? 'from' : 'to'} #{filename}"
+def save_load_feedback_message(from_load, filename)
+	puts "Successfully #{from_load ? 'loaded' : 'saved'} #{@students.count} students #{from_load ? 'from' : 'to'} #{filename}"
 	puts
 end
 
