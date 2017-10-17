@@ -156,14 +156,30 @@ end
 def save_students
 	puts "Name the file you wish to save to. Enter a blank to save to default file."
 	filename = get_filename
-	file = File.open(filename, 'w')
-	@students.each do |student|
-		student_data = [student[:name], student[:cohort]]
-		csv_line = student_data.join(',')
-		file.puts csv_line
+	unless check_before_save(filename)
+		return puts "Cancelled. Did not save to #{filename}"
 	end
-	file.close
+	save_process(filename)
 	save_load_feedback_message(false, filename)
+end
+
+def save_process(filename)
+	File.open(filename, 'w') do |file|
+		@students.each do |student|
+			student_data = [student[:name], student[:cohort]]
+			csv_line = student_data.join(',')
+			file.puts csv_line
+		end
+	end
+end
+
+def check_before_save(filename)
+	if File.exist?(filename)
+		puts "A file called #{filename} already exists. Would you like to overwrite it?"
+		confirm?
+	else
+		true
+	end
 end
 
 def confirm?
@@ -189,15 +205,25 @@ def check_before_load
 		puts "Loading from a file will overwrite the current list.  Would you like to continue?"
 		return puts "Cancelled.  Did not load from file." unless confirm?
 	end
-	load_students
+	filename = get_load_file
+	if File.exist?(filename)
+		load_students(filename)
+	else
+		puts "Cancelled. File not found."
+	end
 end
 
-def load_students(filename = "students.csv")
+def get_load_file
+	puts "Which file would you like to load from? Enter a blank for the default file."
+	get_filename
+end
+
+def load_students(filename = 'students.csv')
 	@students.clear
 	file = File.open(filename, 'r')
 	file.readlines.each do |line|
 		name, cohort = line.chomp.split(',')
-		add_to_student_array(name, cohort.to_sym)
+		add_to_student_array(name, cohort)
 	end
 	file.close
 	save_load_feedback_message(true, filename)
@@ -206,7 +232,7 @@ end
 def try_load_students
 	filename = ARGV.first
 	return load_students if filename.nil?
-	if File.exists?(filename)
+	if File.exist?(filename)
 		load_students(filename)
 	else
 		abort "#{filename} not found"
